@@ -10,7 +10,7 @@ namespace AssistantSample;
 public class BaseballAgentClient
 {
     private readonly HttpClient _httpClient;
-    private readonly string baseballServiceUrl = "https://baseball-agent.wittycliff-2af5d188.australiaeast.azurecontainerapps.io/inference";
+    private readonly string baseballServiceUrl = Environment.GetEnvironmentVariable("SPORTS_SERVICE_URL") ?? "https://baseball-agent.wittycliff-2af5d188.australiaeast.azurecontainerapps.io/inference";
 
     public BaseballAgentClient(HttpClient httpClient)
     {
@@ -19,11 +19,9 @@ public class BaseballAgentClient
 
     public async Task<string> PostQueryAsync(string query)
     {
-var requestUri = Environment.GetEnvironmentVariable("SPORTS_SERVICE_URL") ?? "https://baseball-agent.wittycliff-2af5d188.australiaeast.azurecontainerapps.io/inference";
-
         var content = new StringContent(JsonSerializer.Serialize(new { query }), Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync(requestUri, content);
+        var response = await _httpClient.PostAsync(baseballServiceUrl, content);
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadAsStringAsync();
