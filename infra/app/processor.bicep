@@ -32,6 +32,10 @@ module processor '../core/host/functions-flexconsumption.bicep' = {
     name: name
     location: location
     tags: union(tags, { 'azd-service-name': serviceName })
+    appSettings: union(appSettings,
+      {
+
+      })
     appInsightsConnectionString: appInsightsConnectionString
     appServicePlanId: appServicePlanId
     runtimeName: runtimeName

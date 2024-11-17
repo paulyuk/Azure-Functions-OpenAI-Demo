@@ -9,7 +9,8 @@ param environmentName string
 @description('Primary location for all resources')
 @allowed([ 'eastus', 'eastus2', 'canadaeast'])
 param location string
- 
+param skipVnet bool = false
+param vNetName string = ''
 param appServicePlanName string = ''
 param resourceGroupName string = ''
 param azFunctionName string = ''
@@ -215,9 +216,9 @@ module functionflexconsumption 'app/processor.bicep' = if (azFunctionHostingPlan
     serviceBusQueueName: serviceBus.outputs.serviceBusQueueName
     serviceBusNamespaceFQDN: serviceBus.outputs.serviceBusNamespaceFQDN
      appSettings: {
-       SPORTS_SERVICE_URL: 'https://baseball-agent.wittycliff-2af5d188.australiaeast.azurecontainerapps.io/inference'
+       //SPORTS_SERVICE_URL: 'https://baseball-agent.wittycliff-2af5d188.australiaeast.azurecontainerapps.io/inference'
       }
-    virtualNetworkSubnetId: serviceVirtualNetwork.outputs.functionappSubnetID
+    virtualNetworkSubnetId: serviceVirtualNetwork.outputs.appSubnetID
   }
 }  
 var processorFunctionId = azFunctionHostingPlanType == 'consumption' ? function.outputs.id : functionflexconsumption.outputs.id
@@ -310,7 +311,7 @@ module searchRoleUser 'app/search-access.bicep' = {
   }
 }
 
-module serviceVirtualNetwork 'core/networking/vnet.bicep' = if (azFunctionHostingPlanType == 'flexconsumption'){
+module serviceVirtualNetwork 'app/vnet.bicep' = if (!skipVnet) {
   name: 'serviceVirtualNetwork'
   scope: resourceGroup
   params: {
@@ -320,7 +321,20 @@ module serviceVirtualNetwork 'core/networking/vnet.bicep' = if (azFunctionHostin
   }
 }
 
-module openAiPrivateEndpoint 'app/openai-privateendpoint.bicep' = if (azFunctionHostingPlanType == 'flexconsumption'){
+
+module storagePrivateEndpoint 'app/storage-PrivateEndpoint.bicep' = if (!skipVnet) {
+  name: 'servicePrivateEndpoint'
+  scope: resourceGroup
+  params: {
+    location: location
+    tags: tags
+    virtualNetworkName: !empty(vNetName) ? vNetName : '${abbrs.networkVirtualNetworks}${resourceToken}'
+    subnetName: skipVnet ? '' : serviceVirtualNetwork.outputs.peSubnetName
+    resourceName: storage.outputs.name
+  }
+}
+
+module openAiPrivateEndpoint 'app/openai-privateendpoint.bicep' = if (!skipVnet){
   name: 'openAiPrivateEndpoint'
   scope: resourceGroup
   params: {
