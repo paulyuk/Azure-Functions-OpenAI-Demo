@@ -215,6 +215,7 @@ module functionflexconsumption 'app/processor.bicep' = if (azFunctionHostingPlan
     serviceBusQueueName: serviceBus.outputs.serviceBusQueueName
     serviceBusNamespaceFQDN: serviceBus.outputs.serviceBusNamespaceFQDN
      appSettings: {
+       SPORTS_SERVICE_URL: 'https://baseball-agent.wittycliff-2af5d188.australiaeast.azurecontainerapps.io/inference'
       }
     virtualNetworkSubnetId: serviceVirtualNetwork.outputs.functionappSubnetID
   }
