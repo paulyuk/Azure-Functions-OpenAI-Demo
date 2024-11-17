@@ -3,6 +3,11 @@
 name: azure-search-openai-demo
 metadata:
   template: azure-search-openai-demo@0.0.3-beta
+services:
+  processor:
+    project: ./app/backend
+    language: dotnet
+    host: function
 hooks:
     postprovision:
       windows:

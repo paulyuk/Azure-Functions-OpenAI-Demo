@@ -106,18 +106,6 @@ module openAi 'core/ai/cognitiveservices.bicep' = {
     }
     deployments: [
       {
-        name: embedding.deploymentName
-        capacity: embedding.deploymentCapacity
-        model: {
-          format: 'OpenAI'
-          name: embedding.modelName
-          version: embedding.deploymentVersion
-        }
-        scaleSettings: {
-          scaleType: 'Standard'
-        }
-      }
-      {
         name: chatGpt.deploymentName
         capacity: chatGpt.deploymentCapacity
         model: {
